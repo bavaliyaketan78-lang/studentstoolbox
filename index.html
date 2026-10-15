@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudentToolBox offers free student calculators, writing tools, study planners and useful academic utilities.">
+  <title>StudentToolBox - Free Student Tools</title>
+  <style>
+    :root {
+      --navy: #14213d;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #182230;
+      --muted: #667085;
+      --border: #e4eaf2;
+      --green: #087443;
+      --red: #b42318;
+      --shadow: 0 8px 26px rgba(20, 33, 61, .07);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.55;
+    }
+    header { background: var(--navy); color: white; }
+    .topbar {
+      max-width: 1120px; margin: auto; padding: 17px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -.4px; }
+    .brand span { color: #93c5fd; }
+    nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    nav a { color: #e7eefc; text-decoration: none; font-size: .93rem; }
+    nav a:hover { color: #93c5fd; }
+    .hero {
+      max-width: 1120px; margin: auto; padding: 56px 20px 48px;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-block; background: rgba(147,197,253,.14);
+      border: 1px solid rgba(147,197,253,.3); color: #bfdbfe;
+      border-radius: 999px; padding: 6px 12px; font-size: .82rem;
+    }
+    h1 { font-size: clamp(2rem, 5vw, 3.45rem); line-height: 1.1; margin: 18px 0 14px; }
+    .hero p { color: #d7e1f2; max-width: 650px; margin: 0 auto 24px; }
+    .search-wrap { max-width: 620px; margin: 0 auto; }
+    .search-wrap input {
+      width: 100%; border: 0; border-radius: 12px; padding: 16px 18px;
+      font-size: 1rem; outline: 3px solid transparent;
+    }
+    .search-wrap input:focus { outline-color: #93c5fd; }
+    .container { max-width: 1120px; margin: auto; padding: 28px 20px 54px; }
+    .section-head {
+      display: flex; justify-content: space-between; align-items: end;
+      gap: 12px; flex-wrap: wrap; margin: 0 0 18px;
+    }
+    h2 { margin: 0; font-size: 1.55rem; }
+    .muted { color: var(--muted); font-size: .94rem; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+    .filter-btn {
+      border: 1px solid var(--border); background: white; color: #344054;
+      border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600;
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--blue); color: white; border-color: var(--blue); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .tool-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column;
+      min-width: 0;
+    }
+    .tool-icon {
+      width: 46px; height: 46px; border-radius: 12px; background: #eff6ff;
+      display: grid; place-items: center; font-size: 1.4rem; margin-bottom: 12px;
+    }
+    .tool-card h3 { margin: 0 0 6px; font-size: 1.08rem; }
+    .tool-card p { color: var(--muted); font-size: .92rem; margin: 0 0 15px; flex: 1; }
+    button, input, select, textarea { font: inherit; }
+    .primary-btn {
+      border: 0; border-radius: 10px; padding: 11px 14px; background: var(--blue);
+      color: white; cursor: pointer; font-weight: 700;
+    }
+    .primary-btn:hover { background: var(--blue-dark); }
+    .secondary-btn {
+      border: 1px solid var(--border); border-radius: 10px; padding: 10px 13px;
+      background: white; cursor: pointer; color: var(--text); font-weight: 600;
+    }
+    .secondary-btn:hover { background: #f8fafc; }
+    .empty { display: none; text-align: center; padding: 30px; color: var(--muted); }
+    .info-panel {
+      margin-top: 34px; background: white; border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+    }
+    .info-panel h2 { margin-bottom: 8px; }
+    footer { background: #0f172a; color: #cbd5e1; padding: 25px 20px; text-align: center; font-size: .9rem; }
+    footer a { color: #bfdbfe; }
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 20; background: rgba(15,23,42,.62);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: white; width: min(620px, 100%); max-height: 90vh; overflow-y: auto;
+      border-radius: 18px; padding: 24px; box-shadow: 0 24px 80px rgba(0,0,0,.22);
+    }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .modal-head h2 { font-size: 1.35rem; }
+    .close-btn { border: 0; background: #f2f4f7; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.25rem; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-weight: 700; margin-bottom: 6px; font-size: .92rem; }
+    .field input, .field select, .field textarea {
+      width: 100%; border: 1px solid #cfd7e3; border-radius: 10px; padding: 11px 12px;
+      background: white; color: var(--text);
+    }
+    .field textarea { min-height: 130px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result {
+      margin-top: 14px; padding: 13px 15px; background: #f0fdf4; color: var(--green);
+      border: 1px solid #bbf7d0; border-radius: 10px; font-weight: 700; overflow-wrap: anywhere;
+    }
+    .result.error { background: #fef3f2; color: var(--red); border-color: #fecdca; }
+    .result:empty { display: none; }
+    .button-row { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
+    .small-note { font-size: .82rem; color: var(--muted); margin-top: 10px; }
+    @media (max-width: 820px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 560px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      nav { gap: 12px; }
+      .hero { padding-top: 40px; }
+      .grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .container { padding-left: 14px; padding-right: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">Student<span>ToolBox</span></div>
+      <nav aria-label="Main navigation">
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+        <a href="#footer">Contact</a>
+      </nav>
+    </div>
+    <section class="hero">
+      <span class="eyebrow">Free tools for smarter studying</span>
+      <h1>Your everyday student toolkit.</h1>
+      <p>Calculate marks, plan study time, check your writing and stay organized — all in one simple place.</p>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search tools, e.g. percentage or word counter..." aria-label="Search tools">
+      </div>
+    </section>
+  </header>
+
+  <main class="container" id="tools">
+    <div class="section-head">
+      <div>
+        <h2>Explore student tools</h2>
+        <div class="muted">Free to use. No sign-up required.</div>
+      </div>
+      <div class="muted" id="toolCount">10 tools</div>
+    </div>
+    <div class="filters" aria-label="Filter tools">
+      <button class="filter-btn active" data-category="all">All tools</button>
+      <button class="filter-btn" data-category="calculator">Calculators</button>
+      <button class="filter-btn" data-category="writing">Writing</button>
+      <button class="filter-btn" data-category="study">Study</button>
+      <button class="filter-btn" data-category="utility">Utilities</button>
+    </div>
+
+    <div class="grid" id="toolGrid">
+      <article class="tool-card" data-title="percentage calculator marks exam" data-category="calculator">
+        <div class="tool-icon">％</div><h3>Percentage Calculator</h3>
+        <p>Calculate exam percentage from marks obtained and total marks.</p>
+        <button class="primary-btn" data-tool="percentage">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="cgpa gpa grade calculator" data-category="calculator">
+        <div class="tool-icon">🎓</div><h3>CGPA Calculator</h3>
+        <p>Calculate an average CGPA from semester GPAs. Enter values separated by commas.</p>
+        <button class="primary-btn" data-tool="cgpa">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="word counter characters sentences writing" data-category="writing">
+        <div class="tool-icon">🔤</div><h3>Word Counter</h3>
+        <p>Count words, characters and sentences in your text.</p>
+        <button class="primary-btn" data-tool="word">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="age calculator date of birth birthday" data-category="utility">
+        <div class="tool-icon">🎂</div><h3>Age Calculator</h3>
+        <p>Calculate your age in years, months and days from your date of birth.</p>
+        <button class="primary-btn" data-tool="age">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="study planner timetable study time" data-category="study">
+        <div class="tool-icon">📚</div><h3>Study Time Planner</h3>
+        <p>Plan focused study sessions with breaks and a daily target.</p>
+        <button class="primary-btn" data-tool="planner">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="attendance calculator classes percentage" data-category="calculator">
+        <div class="tool-icon">🗓️</div><h3>Attendance Calculator</h3>
+        <p>Find your current attendance percentage and classes needed to reach a target.</p>
+        <button class="primary-btn" data-tool="attendance">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="unit converter length weight temperature" data-category="utility">
+        <div class="tool-icon">📏</div><h3>Unit Converter</h3>
+        <p>Convert common length, weight and temperature units.</p>
+        <button class="primary-btn" data-tool="converter">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="typing speed test wpm typing practice" data-category="study">
+        <div class="tool-icon">⌨️</div><h3>Typing Speed Test</h3>
+        <p>Practice typing and estimate your words per minute and accuracy.</p>
+        <button class="primary-btn" data-tool="typing">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="grade calculator marks grade" data-category="calculator">
+        <div class="tool-icon">🏅</div><h3>Grade Calculator</h3>
+        <p>Convert a percentage into a configurable letter grade scale.</p>
+        <button class="primary-btn" data-tool="grade">Open tool</button>
+      </article>
+      <article class="tool-card" data-title="text case converter uppercase lowercase title case" data-category="writing">
+        <div class="tool-icon">Aa</div><h3>Text Case Converter</h3>
+        <p>Convert text to uppercase, lowercase or title case and copy the result.</p>
+        <button class="primary-btn" data-tool="case">Open tool</button>
+      </article>
+    </div>
+    <div class="empty" id="emptyState">No tools found. Try another search.</div>
+
+    <section class="info-panel" id="about">
+      <h2>About StudentToolBox</h2>
+      <p class="muted">StudentToolBox is a simple collection of free utilities for students. The tools run in your browser and are designed to help with everyday calculations, writing and study planning. Always check your college's official rules for grading and attendance.</p>
+    </section>
+  </main>
+
+  <footer id="footer">
+    <div><strong>StudentToolBox</strong> — simple tools for student life.</div>
+    <div style="margin-top:6px">Contact: replace-this-with-your-email@example.com</div>
+    <div style="margin-top:6px">© <span id="year"></span> StudentToolBox. Please verify results before relying on them.</div>
+  </footer>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">Tool</h2>
+        <button class="close-btn" id="closeModal" aria-label="Close tool">×</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const backdrop = $("#modalBackdrop");
+    const modalTitle = $("#modalTitle");
+    const modalBody = $("#modalBody");
+    let typingStart = null;
+    let typingTimer = null;
+    let typingElapsed = 0;
+
+    $("#year").textContent = new Date().getFullYear();
+
+    const toolNames = {
+      percentage: "Percentage Calculator", cgpa: "CGPA Calculator", word: "Word Counter",
+      age: "Age Calculator", planner: "Study Time Planner", attendance: "Attendance Calculator",
+      converter: "Unit Converter", typing: "Typing Speed Test", grade: "Grade Calculator",
+      case: "Text Case Converter"
+    };
+
+    function field(label, id, type = "number", placeholder = "", extra = "") {
+      return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" placeholder="${placeholder}" ${extra}></div>`;
+    }
+    function resultArea() { return '<div class="result" id="toolResult" aria-live="polite"></div>'; }
+    function showResult(message, error = false) {
+      const result = $("#toolResult");
+      if (!result) return;
+      result.textContent = message;
+      result.classList.toggle("error", error);
+    }
+    function openTool(tool) {
+      modalTitle.textContent = toolNames[tool] || "Student Tool";
+      typingStart = null; typingElapsed = 0;
+      if (typingTimer) clearInterval(typingTimer);
+      const views = {
+        percentage: `
+          ${field("Marks obtained", "marks", "number", "e.g. 420", 'min="0" step="any"')}
+          ${field("Total marks", "totalMarks", "number", "e.g. 500", 'min="0.01" step="any"')}
+          <button class="primary-btn" id="calculate">Calculate percentage</button>${resultArea()}`,
+        cgpa: `
+          <div class="field"><label for="gpas">Semester GPA values (comma-separated)</label><input id="gpas" type="text" placeholder="e.g. 7.8, 8.2, 7.5"></div>
+          <p class="small-note">This calculates a simple average. If semesters have different credit weights, use your institution's official method.</p>
+          <button class="primary-btn" id="calculate">Calculate CGPA</button>${resultArea()}`,
+        word: `
+          <div class="field"><label for="wordText">Paste or type your text</label><textarea id="wordText" placeholder="Start typing here..."></textarea></div>
+          <div class="result" id="liveWordResult" aria-live="polite">Words: 0 · Characters: 0 · Sentences: 0</div>
+          <div class="button-row"><button class="secondary-btn" id="clearText">Clear text</button><button class="secondary-btn" id="copyText">Copy text</button></div>`,
+        age: `
+          ${field("Date of birth", "dob", "date", "", 'max="' + new Date().toISOString().slice(0,10) + '"')}
+          <button class="primary-btn" id="calculate">Calculate age</button>${resultArea()}`,
+        planner: `
+          <div class="form-row">${field("Total study time (minutes)", "studyMinutes", "number", "e.g. 120", 'min="1" step="1"')}${field("Session length (minutes)", "sessionMinutes", "number", "e.g. 25", 'min="1" step="1"')}</div>
+          ${field("Break length (minutes)", "breakMinutes", "number", "e.g. 5", 'min="0" step="1"')}
+          <button class="primary-btn" id="calculate">Create study plan</button>${resultArea()}`,
+        attendance: `
+          <div class="form-row">${field("Classes attended", "attended", "number", "e.g. 36", 'min="0" step="1"')}${field("Total classes held", "held", "number", "e.g. 45", 'min="0" step="1"')}</div>
+          ${field("Target attendance (%)", "targetAttendance", "number", "e.g. 75", 'min="1" max="100" step="any"')}
+          <button class="primary-btn" id="calculate">Calculate attendance</button>${resultArea()}`,
+        converter: `
+          <div class="field"><label for="unitType">Conversion type</label><select id="unitType"><option value="length">Length (meters / kilometers / centimeters)</option><option value="weight">Weight (kilograms / grams)</option><option value="temp">Temperature (Celsius / Fahrenheit)</option></select></div>
+          <div class="form-row">${field("Value", "unitValue", "number", "Enter value", 'step="any"') }
+          <div class="field"><label for="unitDirection">Convert</label><select id="unitDirection"><option value="forward">First unit → second unit</option><option value="backward">Second unit → first unit</option></select></div></div>
+          <button class="primary-btn" id="calculate">Convert</button>${resultArea()}`,
+        typing: `
+          <p>Type the sample below as accurately as you can. Click Start, type in the box, then click Finish.</p>
+          <div class="info-panel" style="margin:12px 0;padding:14px;background:#f8fafc"><strong id="typingSample">Learning a little every day can help students build strong skills and confidence.</strong></div>
+          <div class="field"><label for="typingInput">Your typing</label><textarea id="typingInput" placeholder="Click Start, then type the sample here..."></textarea></div>
+          <div class="button-row"><button class="primary-btn" id="typingStart">Start test</button><button class="secondary-btn" id="typingFinish">Finish</button><button class="secondary-btn" id="typingReset">Reset</button></div>${resultArea()}
+          <p class="small-note">WPM is an estimate based on typed characters divided into five-character words.</p>`,
+        grade: `
+          ${field("Percentage (0–100)", "gradePercent", "number", "e.g. 82", 'min="0" max="100" step="any"')}
+          <p class="small-note">Default scale: A = 90+, B = 80+, C = 70+, D = 60+, F = below 60. Your institution may use a different scale.</p>
+          <button class="primary-btn" id="calculate">Find grade</button>${resultArea()}`,
+        case: `
+          <div class="field"><label for="caseInput">Your text</label><textarea id="caseInput" placeholder="Type or paste text here..."></textarea></div>
+          <div class="button-row"><button class="primary-btn" id="uppercase">UPPERCASE</button><button class="secondary-btn" id="lowercase">lowercase</button><button class="secondary-btn" id="titlecase">Title Case</button></div>
+          <div class="field" style="margin-top:14px"><label for="caseOutput">Converted text</label><textarea id="caseOutput" placeholder="Your converted text appears here"></textarea></div>
+          <button class="secondary-btn" id="copyCase">Copy converted text</button>${resultArea()}`
+      };
+      modalBody.innerHTML = views[tool] || "<p>Tool not found.</p>";
+      backdrop.classList.add("open");
+      document.body.style.overflow = "hidden";
+      bindTool(tool);
+      const firstInput = $("input, textarea, select", modalBody);
+      if (firstInput) firstInput.focus();
+    }
+    function closeTool() {
+      backdrop.classList.remove("open");
+      document.body.style.overflow = "";
+      if (typingTimer) clearInterval(typingTimer);
+    }
+    function num(id) { return Number($("#" + id)?.value); }
+    function validNonNegative(value) { return Number.isFinite(value) && value >= 0; }
+    function bindTool(tool) {
+      const calc = $("#calculate");
+      if (calc) calc.addEventListener("click", () => {
+        if (tool === "percentage") {
+          const marks = num("marks"), total = num("totalMarks");
+          if (!validNonNegative(marks) || !Number.isFinite(total) || total <= 0 || marks > total) return showResult("Enter valid marks. Obtained marks must not exceed total marks.", true);
+          showResult(`Percentage: ${(marks / total * 100).toFixed(2)}%`);
+        } else if (tool === "cgpa") {
+          const values = $("#gpas").value.split(",").map(v => v.trim()).filter(Boolean).map(Number);
+          if (!values.length || values.some(v => !Number.isFinite(v) || v < 0 || v > 10)) return showResult("Enter GPA values from 0 to 10, separated by commas.", true);
+          showResult(`Average GPA / CGPA estimate: ${(values.reduce((a,b) => a+b, 0) / values.length).toFixed(2)}`);
+        } else if (tool === "age") {
+          const value = $("#dob").value;
+          if (!value) return showResult("Please choose your date of birth.", true);
+          const dob = new Date(value + "T00:00:00");
+          const today = new Date(); today.setHours(0,0,0,0);
+          if (dob > today) return showResult("Date of birth cannot be in the future.", true);
+          let years = today.getFullYear() - dob.getFullYear();
+          let months = today.getMonth() - dob.getMonth();
+          let days = today.getDate() - dob.getDate();
+          if (days < 0) {
+            months--;
+            const previousMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+            days += previousMonthDays;
+          }
+          if (months < 0) { years--; months += 12; }
+          showResult(`Your age is ${years} years, ${months} months and ${days} days.`);
+        } else if (tool === "planner") {
+          const total = num("studyMinutes"), session = num("sessionMinutes"), rest = num("breakMinutes");
+          if (!Number.isInteger(total) || total < 1 || !Number.isInteger(session) || session < 1 || !Number.isInteger(rest) || rest < 0) return showResult("Enter valid whole-number minutes.", true);
+          let remaining = total, sessions = 0, lines = [];
+          while (remaining > 0 && sessions < 100) {
+            const current = Math.min(session, remaining); sessions++;
+            lines.push(`Session ${sessions}: ${current} min study`);
+            remaining -= current;
+            if (remaining > 0 && rest > 0) lines.push(`Break: ${rest} min`);
+          }
+          showResult(`Plan: ${lines.join(" • ")}. Total study time: ${total} minutes.`);
+        } else if (tool === "attendance") {
+          const attended = num("attended"), held = num("held"), target = num("targetAttendance");
+          if (!Number.isInteger(attended) || !Number.isInteger(held) || attended < 0 || held <= 0 || attended > held || !Number.isFinite(target) || target <= 0 || target > 100) return showResult("Enter valid attendance, total classes and target percentage.", true);
+          const current = attended / held * 100;
+          if (current >= target) {
+            const canMiss = target === 100 ? 0 : Math.floor((attended - target * held / 100) / (target / 100));
+            showResult(`Current attendance: ${current.toFixed(2)}%. You meet the target. Approx. classes you could miss while staying at target: ${Math.max(0, canMiss)}.`);
+          } else {
+            const needed = Math.ceil((target * held / 100 - attended) / (1 - target / 100));
+            showResult(`Current attendance: ${current.toFixed(2)}%. Attend approximately ${needed} consecutive classes to reach ${target}%.`);
+          }
+        } else if (tool === "converter") {
+          const value = num("unitValue"), type = $("#unitType").value, direction = $("#unitDirection").value;
+          if (!Number.isFinite(value)) return showResult("Enter a valid number.", true);
+          let answer, from, to;
+          if (type === "length") {
+            if (direction === "forward") { answer = value / 1000; from = "meters"; to = "kilometers"; }
+            else { answer = value * 1000; from = "kilometers"; to = "meters"; }
+          } else if (type === "weight") {
+            if (direction === "forward") { answer = value * 1000; from = "kilograms"; to = "grams"; }
+            else { answer = value / 1000; from = "grams"; to = "kilograms"; }
+          } else {
+            if (direction === "forward") { answer = value * 9 / 5 + 32; from = "°C"; to = "°F"; }
+            else { answer = (value - 32) * 5 / 9; from = "°F"; to = "°C"; }
+          }
+          showResult(`${value} ${from} = ${Number(answer.toFixed(6))} ${to}`);
+        } else if (tool === "grade") {
+          const p = num("gradePercent");
+          if (!Number.isFinite(p) || p < 0 || p > 100) return showResult("Enter a percentage from 0 to 100.", true);
+          const grade = p >= 90 ? "A" : p >= 80 ? "B" : p >= 70 ? "C" : p >= 60 ? "D" : "F";
+          showResult(`Grade estimate: ${grade} (${p.toFixed(2)}%). Check your institution's grading scale.`);
+        }
+      });
+
+      if (tool === "word") {
+        const textArea = $("#wordText");
+        const update = () => {
+          const text = textArea.value;
+          const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+          const sentences = text.trim() ? (text.match(/[.!?]+(?=\s|$)/g) || []).length : 0;
+          $("#liveWordResult").textContent = `Words: ${words} · Characters: ${text.length} · Characters (no spaces): ${text.replace(/\s/g, "").length} · Sentences: ${sentences}`;
+        };
+        textArea.addEventListener("input", update);
+        $("#clearText").addEventListener("click", () => { textArea.value = ""; update(); textArea.focus(); });
+        $("#copyText").addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText(textArea.value); showResult("Text copied."); }
+          catch { showResult("Copy was blocked by the browser. Select and copy the text manually.", true); }
+        });
+      }
+      if (tool === "typing") {
+        const sample = $("#typingSample").textContent;
+        $("#typingStart").addEventListener("click", () => {
+          $("#typingInput").value = ""; $("#typingInput").disabled = false; $("#typingInput").focus();
+          typingStart = Date.now(); typingElapsed = 0;
+          showResult("Test started. Type the sample and click Finish when done.");
+          if (typingTimer) clearInterval(typingTimer);
+          typingTimer = setInterval(() => { if (typingStart) typingElapsed = (Date.now() - typingStart) / 1000; }, 250);
+        });
+        $("#typingFinish").addEventListener("click", () => {
+          if (!typingStart) return showResult("Click Start test first.", true);
+          if (typingTimer) clearInterval(typingTimer);
+          typingElapsed = Math.max((Date.now() - typingStart) / 1000, 1);
+          const typed = $("#typingInput").value;
+          const words = typed.trim() ? typed.trim().split(/\s+/).length : 0;
+          const wpm = Math.round(words / (typingElapsed / 60));
+          let correct = 0;
+          for (let i = 0; i < Math.min(typed.length, sample.length); i++) if (typed[i] === sample[i]) correct++;
+          const accuracy = typed.length ? correct / typed.length * 100 : 0;
+          typingStart = null;
+          showResult(`Time: ${Math.round(typingElapsed)} sec · Speed: ${wpm} WPM · Character accuracy: ${accuracy.toFixed(1)}%`);
+        });
+        $("#typingReset").addEventListener("click", () => { if (typingTimer) clearInterval(typingTimer); typingStart = null; $("#typingInput").value = ""; showResult(""); });
+      }
+      if (tool === "case") {
+        $("#uppercase").addEventListener("click", () => { $("#caseOutput").value = $("#caseInput").value.toUpperCase(); showResult("Converted to uppercase."); });
+        $("#lowercase").addEventListener("click", () => { $("#caseOutput").value = $("#caseInput").value.toLowerCase(); showResult("Converted to lowercase."); });
+        $("#titlecase").addEventListener("click", () => { $("#caseOutput").value = $("#caseInput").value.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()); showResult("Converted to title case."); });
+        $("#copyCase").addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText($("#caseOutput").value); showResult("Converted text copied."); }
+          catch { showResult("Copy was blocked by the browser. Select and copy the result manually.", true); }
+        });
+      }
+    }
+
+    $$(".tool-card [data-tool]").forEach(button => button.addEventListener("click", () => openTool(button.dataset.tool)));
+    $("#closeModal").addEventListener("click", closeTool);
+    backdrop.addEventListener("click", event => { if (event.target === backdrop) closeTool(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && backdrop.classList.contains("open")) closeTool(); });
+
+    let activeCategory = "all";
+    function filterTools() {
+      const query = $("#searchInput").value.trim().toLowerCase();
+      let visible = 0;
+      $$(".tool-card").forEach(card => {
+        const categoryMatch = activeCategory === "all" || card.dataset.category === activeCategory;
+        const queryMatch = !query || (card.dataset.title + " " + card.textContent).toLowerCase().includes(query);
+        const show = categoryMatch && queryMatch;
+        card.style.display = show ? "flex" : "none";
+        if (show) visible++;
+      });
+      $("#toolCount").textContent = `${visible} tool${visible === 1 ? "" : "s"}`;
+      $("#emptyState").style.display = visible ? "none" : "block";
+    }
+    $("#searchInput").addEventListener("input", filterTools);
+    $$(".filter-btn").forEach(button => button.addEventListener("click", () => {
+      activeCategory = button.dataset.category;
+      $$(".filter-btn").forEach(b => b.classList.toggle("active", b === button));
+      filterTools();
+    }));
+  </script>
+</body>
+</html>
